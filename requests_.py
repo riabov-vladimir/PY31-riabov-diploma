@@ -31,7 +31,7 @@ def friends_get(user_id: int) -> list:
 		'access_token': access_token,
 		'v': 5.107,
 		'user_id': user_id,
-		# 'count': 10,
+		#'count': 10,
 		# 'order': 'name'
 	}
 
@@ -52,7 +52,7 @@ def groups_get(user_id: int) -> list:
 	}
 
 	response = requests.get(request_url, params=params)
-	json_ = response.json()  # ['response']['items']
+	json_ = response.json()['response']['items']
 	return json_
 
 
@@ -68,18 +68,11 @@ def members_get(group_id: str) -> list:
 	}
 
 	response = requests.get(request_url, params=params)
-	json_ = response.json()  # ['response']['items']
+	json_ = response.json() # ['response']['items']
 	return json_
 
 
-def members_get_friends(group_id: str, user_id: int or str) -> list:
-
-	"""
-
-	!!!!!!!!!!     ВОПРОС №1      !!!!!!!!!!
-
-	функция возвращающая список участников сообщества;
-	:filter: friends — будут возвращены только друзья в этом сообществе."""
+def members_get_friends(group_id: str, user_id: int or str) -> list: # ????
 
 	request_url = 'https://api.vk.com/method/groups.getMembers'
 	params = {
@@ -91,14 +84,13 @@ def members_get_friends(group_id: str, user_id: int or str) -> list:
 	}
 
 	response = requests.get(request_url, params=params)
-	json_ = response.json()  # ['response']['items']
+	json_ = response.json()['response']['items']
 	return json_
 
 
-def groups_isMember(group_id, user_id):
+def groups_isMember(group_id: str, user_id: int):
 
-	"""функция возвращающая список участников сообщества;
-	:filter: friends — будут возвращены только друзья в этом сообществе."""
+	"""Состоит ли пользователь в сообществе"""
 
 	request_url = 'https://api.vk.com/method/groups.isMember'
 	params = {
@@ -110,7 +102,7 @@ def groups_isMember(group_id, user_id):
 	}
 
 	response = requests.get(request_url, params=params)
-	json_ = response.json()  # ['response']['items']
+	json_ = response.json() #['response']
 	return json_
 
 
@@ -123,5 +115,6 @@ def groups_isMember(group_id, user_id):
 # print(members_get('30936477'))
 
 if __name__ == "__main__":
-	print(user_id_from_str('damnmeandyou'))
-	pass
+	print(groups_isMember('30936477', '35egrg5070'))
+	pprint(groups_get(355070))
+

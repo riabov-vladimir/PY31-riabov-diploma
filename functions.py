@@ -1,13 +1,21 @@
 import json
 from pprint import pprint
 import time
-from requests_ import user_id_from_str
+# from requests_ import user_id_from_str
+import os
 
 
 def json_to_file(script_result):
 	"""функция записывающая данные в файл 'groups.json' """
 	with open('groups.json', 'w', encoding='utf-8') as output_file:
 		json.dump(script_result, output_file, ensure_ascii=False, indent=4)
+
+
+def group_append(text):
+	with open('output_file.txt', 'a', encoding='utf-8') as output_file:
+		output_file.write(os.linesep)
+		# output_file.write(str(datetime.datetime.utcnow()))
+		output_file.write(str(text))
 
 
 def print_json_file(input_file):
@@ -18,11 +26,7 @@ def print_json_file(input_file):
 
 
 def get_int_id(user_id):
-	"""
 
-	!!!!!!!!!!!!      ВОПРОС №3        !!!!!!!!!!!!!!
-
-	"""
 	if type(user_id) == int:
 		return user_id
 	elif type(user_id) == str:
