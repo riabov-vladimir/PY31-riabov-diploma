@@ -1,7 +1,6 @@
 import json
 from pprint import pprint
 import time
-# from requests_ import user_id_from_str
 import os
 
 
@@ -12,6 +11,11 @@ def json_to_file(script_result):
 
 
 def group_append(text):
+	"""
+	Функция для логирования моих расчётов
+	:param text:
+	:return:
+	"""
 	with open('output_file.txt', 'a', encoding='utf-8') as output_file:
 		output_file.write(os.linesep)
 		# output_file.write(str(datetime.datetime.utcnow()))
@@ -25,12 +29,7 @@ def print_json_file(input_file):
 		pprint(reader)
 
 
-def get_int_id(user_id):
 
-	if type(user_id) == int:
-		return user_id
-	elif type(user_id) == str:
-		return user_id_from_str(user_id)
 
 
 if __name__ == '__main__':

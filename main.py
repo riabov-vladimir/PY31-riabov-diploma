@@ -1,33 +1,32 @@
 from requests_ import groups_get, groups_isMember, friends_get, user_id_str_to_int
 import time
-from functions import group_append
 
-access_token = '958eb5d439726565e9333aa30e50e0f937ee432e927f0dbd541c541887d919a7c56f95c04217915c32008'
 
-user_id = user_id_str_to_int('arbore') # (eshmargunov) и id (171691064)
+user_id = user_id_str_to_int('arbore') # пользователь с 3 друзьями и ~20 группами
 
-groups = groups_get(user_id)
+groups = groups_get(user_id)  # все группы пользователя
 group_append('Ksenia groups :' + str(groups))
 
-friends = friends_get(user_id)
+friends = friends_get(user_id) # все друзья пользователя
 group_append('Ksenia friends :' + str(friends))
 
 target = groups.copy()
+"""список всех групп пользователя из которых в цикле будет удаляться каждая группа
+в которой состоит хотя бы один друг пользователя"""
 
 for group in groups:
 	print('iterating for group ' + str(group))
 	for friend in friends:
-		print(str(friend) + ' + ' + str(group))
-		time.sleep(0.34)
+		print(str(friend) + ' -> ' + str(group))
+		time.sleep(0.4)
 		if groups_isMember(str(group), friend) == 1:
-			print('found match          <---------------------- ')
+			print('пользователь являяется участником группы, группа исключена из списка <---------------------- ')
 			target.remove(group)
 			break
 	else:
 		print('no match')
 
 
+print('Группы в которых состоит пользователь, но не состоят его друзья:\n' + str(target))
 
-print('target group = ' + str(target))
-
-group_append(groups_get(user_id))
+group_append(groups_get(user_id))  # сохраняю на всякий случай резултат

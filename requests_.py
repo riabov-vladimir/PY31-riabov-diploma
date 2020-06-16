@@ -2,12 +2,13 @@ import requests
 from pprint import pprint
 import time
 
-access_token = '958eb5d439726565e9333aa30e50e0f937ee432e927f0dbd541c541887d919a7c56f95c04217915c32008' # scope_friends
+access_token = '958eb5d439726565e9333aa30e50e0f937ee432e927f0dbd541c541887d919a7c56f95c04217915c32008'
 
 
 def user_id_str_to_int(user_id: str) -> int:
-
-	"""функция принимающая screen_name и возвращающая числовой id пользовтаеля"""
+	"""
+	функция принимающая screen_name и возвращающая числовой id пользовтаеля
+	"""
 
 	request_url = 'https://api.vk.com/method/users.get'
 	params = {
@@ -20,6 +21,16 @@ def user_id_str_to_int(user_id: str) -> int:
 	json_ = response.json()['response'][0]['id']
 	return json_
 
+
+def get_int_id(user_id: str or int):
+	"""
+	Логика позволяющая принимать в качестве user_id как числовой идентификатор, так и screen_name
+	"""
+
+	if type(user_id) == int:
+		return user_id
+	elif type(user_id) == str:
+		return user_id_str_to_int(user_id)
 
 
 def friends_get(user_id: int) -> list:
@@ -56,38 +67,6 @@ def groups_get(user_id: int) -> list:
 	return json_
 
 
-def members_get(group_id: str) -> list:
-
-	"""функция возвращающая список участников сообщества"""
-
-	request_url = 'https://api.vk.com/method/groups.getMembers'
-	params = {
-		'access_token': access_token,
-		'v': 5.107,
-		'group_id': group_id,
-	}
-
-	response = requests.get(request_url, params=params)
-	json_ = response.json() # ['response']['items']
-	return json_
-
-
-def members_get_friends(group_id: str, user_id: int or str) -> list: # ????
-
-	request_url = 'https://api.vk.com/method/groups.getMembers'
-	params = {
-		'access_token': access_token,
-		'v': 5.107,
-		'group_id': group_id,
-		'filter': 'friends',
-		'user_id': user_id
-	}
-
-	response = requests.get(request_url, params=params)
-	json_ = response.json()['response']['items']
-	return json_
-
-
 def groups_isMember(group_id: str, user_id: int):
 
 	"""Состоит ли пользователь в сообществе"""
@@ -102,19 +81,30 @@ def groups_isMember(group_id: str, user_id: int):
 	}
 
 	response = requests.get(request_url, params=params)
-	json_ = response.json() #['response']
+	try:
+		json_ = response.json()['response']
+	except KeyError as e:
+		print(f'Пользователь под номером {str(user_id)} удалён или заблокирован')
+	else:
+		return json_
+
+groups_list = [45491419, 140105161, 88350989, 95648824, 33621085, 164765862, 144822899, 78920715, 29534144, 26750264, 55404958, 72188644, 63731512, 90464514, 137153726, 91421416]
+
+def groups_list_info(groups_list: list):
+
+	request_url = 'https://api.vk.com/method/groups.getById'
+
+	params = {
+		'access_token': access_token,
+		'v': 5.107,
+		'group_ids': str(groups_list)[1:-1:],
+	}
+
+	response = requests.get(request_url, params=params)
+	json_ = response.json()['response']
 	return json_
 
 
-# pprint(friends_get(355070))
-# pprint(groups_get(355070))
-# json_to_file(groups_get(355070))
-# print(groups_isMember('30936477', 355070))
-# print(members_get_friends('30936477', 355070))
-# print(members_get('30936477'))
-# print(members_get('30936477'))
-
 if __name__ == "__main__":
-	print(groups_isMember('30936477', '35egrg5070'))
-	pprint(groups_get(355070))
+	pprint(groups_list_info(groups_list))
 
