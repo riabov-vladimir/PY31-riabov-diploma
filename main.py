@@ -3,27 +3,29 @@ from pprint import pprint
 from functions import json_to_file, print_json_file
 import time
 
-user_id = get_int_id(171691064)  # пользователь с 3 друзьями и ~20 группами
+user_id = get_int_id('arbore')  # пользователь
 
 groups = groups_get(user_id)  # все группы пользователя
-print(groups)
+
 friends = friends_get(user_id)  # все друзья пользователя
 
-target_list = groups.copy()
-print('target list: ' + str(target_list))
+target_list = []
+
 for group in groups:
-	print(group)
-	try:
-		target = groups_is_member(group, friends)
-	except Exception as e:
-		print(e)
+
+	target = groups_is_member(group, friends)
+
 	for user in target:
 		if user['member'] == 1:
-			target_list.remove(group)
+			target_list.append(group)
+			break
 	print('.')
 	time.sleep(0.4)
 
-print('Группы в которых состоит пользователь, но не состоят его друзья:\n' + str(target_list))
+
+groups = list(set(groups) - set(target_list))
+
+print('Группы в которых состоит пользователь, но не состоят его друзья:\n' + str(groups))
 
 groups_info = groups_list_info(target_list)
 
