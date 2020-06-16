@@ -1,32 +1,38 @@
-from requests_ import groups_get, groups_isMember, friends_get, user_id_str_to_int
+from requests_ import groups_get, groups_is_member, friends_get, get_int_id, groups_list_info
+from pprint import pprint
+from functions import json_to_file, print_json_file
 import time
 
-
-user_id = user_id_str_to_int('arbore') # пользователь с 3 друзьями и ~20 группами
+user_id = get_int_id(171691064)  # пользователь с 3 друзьями и ~20 группами
 
 groups = groups_get(user_id)  # все группы пользователя
-group_append('Ksenia groups :' + str(groups))
+print(groups)
+friends = friends_get(user_id)  # все друзья пользователя
 
-friends = friends_get(user_id) # все друзья пользователя
-group_append('Ksenia friends :' + str(friends))
-
-target = groups.copy()
-"""список всех групп пользователя из которых в цикле будет удаляться каждая группа
-в которой состоит хотя бы один друг пользователя"""
-
+target_list = groups.copy()
+print('target list: ' + str(target_list))
 for group in groups:
-	print('iterating for group ' + str(group))
-	for friend in friends:
-		print(str(friend) + ' -> ' + str(group))
-		time.sleep(0.4)
-		if groups_isMember(str(group), friend) == 1:
-			print('пользователь являяется участником группы, группа исключена из списка <---------------------- ')
-			target.remove(group)
-			break
-	else:
-		print('no match')
+	print(group)
+	try:
+		target = groups_is_member(group, friends)
+	except Exception as e:
+		print(e)
+	for user in target:
+		if user['member'] == 1:
+			target_list.remove(group)
+	print('.')
+	time.sleep(0.4)
 
+print('Группы в которых состоит пользователь, но не состоят его друзья:\n' + str(target_list))
 
-print('Группы в которых состоит пользователь, но не состоят его друзья:\n' + str(target))
+groups_info = groups_list_info(target_list)
 
-group_append(groups_get(user_id))  # сохраняю на всякий случай резултат
+for group in groups_info:
+	del group['is_closed']
+	del group['photo_100']
+	del group['photo_200']
+	del group['photo_50']
+	del group['screen_name']
+	del group['type']
+
+json_to_file(groups_info)

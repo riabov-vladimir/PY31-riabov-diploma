@@ -42,8 +42,7 @@ def friends_get(user_id: int) -> list:
 		'access_token': access_token,
 		'v': 5.107,
 		'user_id': user_id,
-		#'count': 10,
-		# 'order': 'name'
+		'count': 1000,
 	}
 
 	response = requests.get(request_url, params=params)
@@ -60,6 +59,7 @@ def groups_get(user_id: int) -> list:
 		'access_token': access_token,
 		'v': 5.107,
 		'user_id': user_id,
+		'count': 500
 	}
 
 	response = requests.get(request_url, params=params)
@@ -67,7 +67,7 @@ def groups_get(user_id: int) -> list:
 	return json_
 
 
-def groups_isMember(group_id: str, user_id: int):
+def groups_is_member(group_id: str, user_ids: list):
 
 	"""Состоит ли пользователь в сообществе"""
 
@@ -76,19 +76,19 @@ def groups_isMember(group_id: str, user_id: int):
 		'access_token': access_token,
 		'v': 5.107,
 		'group_id': group_id,
-		# 'user_ids': None,
-		'user_id': user_id
+		'user_ids': str(user_ids)[1:-1:]
 	}
 
 	response = requests.get(request_url, params=params)
-	try:
-		json_ = response.json()['response']
-	except KeyError as e:
-		print(f'Пользователь под номером {str(user_id)} удалён или заблокирован')
-	else:
-		return json_
 
-groups_list = [45491419, 140105161, 88350989, 95648824, 33621085, 164765862, 144822899, 78920715, 29534144, 26750264, 55404958, 72188644, 63731512, 90464514, 137153726, 91421416]
+	json_ = response.json()['response']
+
+	return json_
+
+
+groups_test = [45491419, 140105161, 88350989, 95648824, 33621085, 164765862, 144822899, 78920715, 29534144, 26750264,
+			55404958, 72188644, 63731512, 90464514, 137153726, 91421416]
+
 
 def groups_list_info(groups_list: list):
 
@@ -98,13 +98,16 @@ def groups_list_info(groups_list: list):
 		'access_token': access_token,
 		'v': 5.107,
 		'group_ids': str(groups_list)[1:-1:],
+		'fields': 'members_count'
 	}
 
 	response = requests.get(request_url, params=params)
+
 	json_ = response.json()['response']
+
 	return json_
 
 
 if __name__ == "__main__":
-	pprint(groups_list_info(groups_list))
-
+	pprint(groups_get(171691064))
+	pprint(groups_is_member('8564', groups_test))
