@@ -22,7 +22,7 @@ def user_id_str_to_int(user_id: str) -> int:
 	return json_
 
 
-def get_int_id(user_id: str or int):
+def get_int_id(user_id='arbore'):
 	"""
 	Логика позволяющая принимать в качестве user_id как числовой идентификатор, так и screen_name
 	"""

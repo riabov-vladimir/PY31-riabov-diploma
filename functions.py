@@ -22,7 +22,7 @@ def group_append(text):
 		output_file.write(str(text))
 
 
-def print_json_file(input_file):
+def print_json_file(input_file='groups.json'):
 	"""функция для десериализации json файлов, использую для проверки записаных файлов"""
 	with open(input_file, encoding='utf-8') as file:
 		reader = json.load(file)
