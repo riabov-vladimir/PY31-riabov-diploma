@@ -1,14 +1,11 @@
-from requests_ import groups_get, groups_is_member, friends_get, get_int_id, groups_list_info
+from requests_ import groups_get, groups_is_member, friends_get, groups_list_info, user_id_str_to_int
 from pprint import pprint
 from functions import json_to_file, print_json_file
 import time
 import datetime
 
-user_input = input('Введите id пользователя или его screen_name')
-if user_input.
 
-
-user_id = get_int_id()  # пользователь по умолчанию arbore (функция принимает и screen name и user id)
+user_id = user_id_str_to_int('arbore')  # пользователь по умолчанию arbore (функция принимает и screen name и user id)
 
 groups = groups_get(user_id)  # все группы пользователя
 

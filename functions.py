@@ -45,8 +45,5 @@ def print_json_file(input_file='groups.json'):
 		pprint(reader)
 
 
-
-
-
 if __name__ == '__main__':
 	print(get_int_id('eshmargunov'))
