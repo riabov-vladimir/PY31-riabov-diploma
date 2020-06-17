@@ -4,6 +4,8 @@ from functions import json_to_file, print_json_file
 import time
 import datetime
 
+user_input = input('Введите id пользователя или его screen_name')
+if user_input.
 
 
 user_id = get_int_id()  # пользователь по умолчанию arbore (функция принимает и screen name и user id)

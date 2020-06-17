@@ -2,6 +2,22 @@ import json
 from pprint import pprint
 import time
 import os
+from requests_ import user_id_str_to_int
+
+def input_user_id():
+	"""
+	Функция вызывает операцию консольного ввода и определяет в каком виде задан идентификатор пользователя.
+	Возвращает
+	:return:
+	"""
+
+	print('Введите id пользователя или его screen name')
+	user_id = input('>>>').lower()
+
+	if user_id.isdigit():
+		return int(user_id)
+	else:
+		return user_id_str_to_int(user_id)
 
 
 def json_to_file(script_result):

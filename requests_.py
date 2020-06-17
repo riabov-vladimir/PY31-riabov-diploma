@@ -86,10 +86,6 @@ def groups_is_member(group_id: str, user_ids: list):
 	return json_
 
 
-groups_test = [45491419, 140105161, 88350989, 95648824, 33621085, 164765862, 144822899, 78920715, 29534144, 26750264,
-			55404958, 72188644, 63731512, 90464514, 137153726, 91421416]
-
-
 def groups_list_info(groups_list: list):
 
 	request_url = 'https://api.vk.com/method/groups.getById'
