@@ -2,126 +2,129 @@ import requests
 from pprint import pprint
 import time
 
-access_token = '958eb5d439726565e9333aa30e50e0f937ee432e927f0dbd541c541887d919a7c56f95c04217915c32008' # scope_friends
+access_token = '958eb5d439726565e9333aa30e50e0f937ee432e927f0dbd541c541887d919a7c56f95c04217915c32008'
+
+base_url = 'https://api.vk.com/method/'
+base_params = {'access_token': access_token, 'v': 5.107}
 
 
-def user_id_str_to_int(user_id: str) -> int:
+def check_user():
+	"""
+	Наверное, не очень грамотно делать такую нагроможденную функцию, но я всё же решил совместить запрос
+	на проверку состояния страницы пользователя (удалена, заблокирована, отсутствует) и приведение идентификатора
+	к численному виду, т.к. очень удобно делать рекурсию на повторный запрос консольного ввода.
+	*Запрос users.get, как я выяснил буквально вчера, принимает как str, так и int -- очень удобно!
+	:return: user_id (integer)
+	"""
 
-	"""функция принимающая screen_name и возвращающая числовой id пользовтаеля"""
+	print('Введите id пользователя или его screen name')
+	user_id = input('>>>').lower()
 
-	request_url = 'https://api.vk.com/method/users.get'
-	params = {
-		'access_token': access_token,
-		'v': 5.107,
-		'user_ids': user_id,
-	}
-
+	request_url = base_url + 'users.get'
+	params = base_params.copy()
+	params['user_ids'] = user_id
 	response = requests.get(request_url, params=params)
-	json_ = response.json()['response'][0]['id']
-	return json_
+	# json_ = response.json()
 
+	if 'error' in response.json().keys():
+		print('Возникла ошибка: ' + json_['error']['error_msg'] + '\n')
+		check_user()
+	elif response.json()['response'][0].get('is_closed'):
+		print('Пользователь ограничил доступ к своей странице.\n')
+		check_user()
+	elif response.json()['response'][0].get('deactivated') == 'deleted':
+		print('Пользователь удалён.\n')
+		check_user()
+	elif response.json()['response'][0].get('deactivated') == 'banned':
+		print('Пользователь заблокирован.\n')
+		check_user()
+	elif not response.json()['response'][0].get('is_closed'):
+		return response.json()['response'][0]['id']  # числовой идентификатор
 
 
 def friends_get(user_id: int) -> list:
 
-	"""функция возвращающая список друзей пользовтаеля"""
+	"""
+	Функция возвращающая список друзей пользовтаеля.
+	*Ограничил кол-во возвращаемых идентификаторов до 500, для того, чтобы в дальнейшем уложиться
+	в лимит аргументов user_ids метода 'groups.isMember'
+	:param user_id: int
+	:return: list of int
+	"""
 
-	request_url = 'https://api.vk.com/method/friends.get'
+	request_url = base_url + 'friends.get'
 	params = {
 		'access_token': access_token,
 		'v': 5.107,
 		'user_id': user_id,
-		# 'count': 10,
-		# 'order': 'name'
+		'count': 500,
 	}
 
 	response = requests.get(request_url, params=params)
-	json_ = response.json()['response']['items']
-	return json_
+
+	return response.json()['response']['items']
 
 
 def groups_get(user_id: int) -> list:
 
-	"""функция возвразающая список групп, в которых состоит пользователь"""
+	"""Функция возвразающая список групп, в которых состоит указанный пользователь"""
 
-	request_url = 'https://api.vk.com/method/groups.get'
+	request_url = base_url + 'groups.get'
 	params = {
 		'access_token': access_token,
 		'v': 5.107,
 		'user_id': user_id,
+		'count': 500
 	}
 
 	response = requests.get(request_url, params=params)
-	json_ = response.json()  # ['response']['items']
-	return json_
+
+	return response.json()['response']['items']
 
 
-def members_get(group_id: str) -> list:
-
-	"""функция возвращающая список участников сообщества"""
-
-	request_url = 'https://api.vk.com/method/groups.getMembers'
-	params = {
-		'access_token': access_token,
-		'v': 5.107,
-		'group_id': group_id,
-	}
-
-	response = requests.get(request_url, params=params)
-	json_ = response.json()  # ['response']['items']
-	return json_
-
-
-def members_get_friends(group_id: str, user_id: int or str) -> list:
+def groups_is_member(group_id: str, user_ids: list) -> list:
 
 	"""
+	Функция принимающая в качестве аргумента список идентификаторов пользователей и идентификатор группы,
+	а возвращающая список из словарей, содержащих подробную информацию о принадлежности каждого из пользователей к
+	указанной группе
 
-	!!!!!!!!!!     ВОПРОС №1      !!!!!!!!!!
+	:param group_id:
+	:param user_ids:
+	:return: list of dicts
+	"""
 
-	функция возвращающая список участников сообщества;
-	:filter: friends — будут возвращены только друзья в этом сообществе."""
-
-	request_url = 'https://api.vk.com/method/groups.getMembers'
+	request_url = base_url + 'groups.isMember'
 	params = {
 		'access_token': access_token,
 		'v': 5.107,
 		'group_id': group_id,
-		'filter': 'friends',
-		'user_id': user_id
+		'user_ids': str(user_ids)[1:-1:]
 	}
 
 	response = requests.get(request_url, params=params)
-	json_ = response.json()  # ['response']['items']
-	return json_
+
+	return response.json()['response']
 
 
-def groups_isMember(group_id, user_id):
+def groups_list_info(groups_list: list):
+	"""
+	Функция принимающая в качестве аргумента список идентификаторов групп и возвращающая список из словарей,
+	содержащих подробную информацию о каждой группе
 
-	"""функция возвращающая список участников сообщества;
-	:filter: friends — будут возвращены только друзья в этом сообществе."""
+	:param groups_list: list of int
+	:return: list of dicts
+	"""
 
-	request_url = 'https://api.vk.com/method/groups.isMember'
+	request_url = base_url + 'groups.getById'
+
 	params = {
 		'access_token': access_token,
 		'v': 5.107,
-		'group_id': group_id,
-		# 'user_ids': None,
-		'user_id': user_id
+		'group_ids': str(groups_list)[1:-1:],
+		'fields': 'members_count'
 	}
 
 	response = requests.get(request_url, params=params)
-	json_ = response.json()  # ['response']['items']
-	return json_
 
-
-# pprint(friends_get(355070))
-# pprint(groups_get(355070))
-# json_to_file(groups_get(355070))
-# print(groups_isMember('30936477', 355070))
-# print(members_get_friends('30936477', 355070))
-# print(members_get('30936477'))
-# print(members_get('30936477'))
-
-if __name__ == "__main__":
-	print(user_id_from_str('damnmeandyou'))
-	pass
+	return response.json()['response']
