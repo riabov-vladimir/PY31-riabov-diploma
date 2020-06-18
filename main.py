@@ -1,11 +1,17 @@
-from requests_ import groups_get, groups_is_member, friends_get, groups_list_info, user_id_str_to_int
-from pprint import pprint
+from requests_ import groups_get, groups_is_member, friends_get, groups_list_info, check_user
 from functions import json_to_file, print_json_file
 import time
 import datetime
+"""
+Ввод данных (идентификатор пользователя) осуществляется через консоль. Аргументом может быть как id так и screen_name.
+Идентификаторы, которые я использовал для проверки программы:
+372957 - Пользователь удалён
+anyagrapes - Пользователь заблокирован
+eshmargunov - открытый профиль, программа отрабатывает полностью
+arbore - открытый профиль, программа отрабатывает полностью
+"""
 
-
-user_id = user_id_str_to_int('arbore')  # пользователь по умолчанию arbore (функция принимает и screen name и user id)
+user_id = check_user()  # проверяем доступ к данным пользователя (функция принимает и screen name и user id)
 
 groups = groups_get(user_id)  # все группы пользователя
 
