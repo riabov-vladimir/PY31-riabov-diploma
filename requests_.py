@@ -24,16 +24,16 @@ def check_user(user_input) -> int:
 
 	if 'error' in response.json().keys():
 		print('Возникла ошибка: ' + response.json()['error']['error_msg'] + '\n')
-		check_user()
+		exit()
 	elif response.json()['response'][0].get('is_closed'):
 		print('Пользователь ограничил доступ к своей странице.\n')
-		check_user()
+		exit()
 	elif response.json()['response'][0].get('deactivated') == 'deleted':
 		print('Пользователь удалён.\n')
-		check_user()
+		exit()
 	elif response.json()['response'][0].get('deactivated') == 'banned':
 		print('Пользователь заблокирован.\n')
-		check_user()
+		exit()
 	elif not response.json()['response'][0].get('is_closed'):
 		return response.json()['response'][0]['id']  # числовой идентификатор
 
