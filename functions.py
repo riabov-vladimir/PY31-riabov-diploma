@@ -18,6 +18,13 @@ def print_json_file(input_file='groups.json'):
 
 
 def sort_groups(groups, friends):
+	"""
+	Функция проверяющая каждую группу из списка на вхождение в неё пользователей из списка. Обращается к API VK при
+	помощи метода 'groups.isMember'
+	:param groups: list of int
+	:param friends: list of int
+	:return: list of int
+	"""
 
 	target_list = []  # сюда будем складывать группы в которых состоят друзья
 

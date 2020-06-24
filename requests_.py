@@ -8,7 +8,7 @@ base_url = 'https://api.vk.com/method/'
 base_params = {'access_token': access_token, 'v': 5.107}
 
 
-def check_user():
+def check_user(user_input) -> int:
 	"""
 	Наверное, не очень грамотно делать такую нагроможденную функцию, но я всё же решил совместить запрос
 	на проверку состояния страницы пользователя (удалена, заблокирована, отсутствует) и приведение идентификатора
@@ -17,12 +17,9 @@ def check_user():
 	:return: user_id (integer)
 	"""
 
-	print('Введите id пользователя или его screen name')
-	user_id = input('>>>').lower()
-
 	request_url = base_url + 'users.get'
 	params = base_params.copy()
-	params['user_ids'] = user_id
+	params['user_ids'] = user_input
 	response = requests.get(request_url, params=params)
 
 	if 'error' in response.json().keys():
