@@ -13,3 +13,4 @@ def print_json_file(input_file='groups.json'):
 	with open(input_file, encoding='utf-8') as file:
 		reader = json.load(file)
 		pprint(reader)
+

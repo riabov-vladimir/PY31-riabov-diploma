@@ -59,5 +59,5 @@ if user_input == '':
 	print_json_file()
 else:
 	print('До свидания!')
-	pass
+
 
