@@ -1,5 +1,5 @@
 from requests_ import groups_get, groups_is_member, friends_get, groups_list_info, check_user
-from functions import json_to_file, print_json_file
+from functions import json_to_file, print_json_file, sort_groups
 import time
 import datetime
 """
@@ -23,26 +23,11 @@ if __name__ == '__main__':
 	# 0.4 сек задержка между запросами + 0.1 сек приерное время сопутствующих операций * кол-во запросов
 	print(f'Примерное время выполнение кода: {timer} \n Ожидайте...')
 
-	target_list = []  # сюда будем складывать группы в которых состоят друзья
+	sorted_groups = sort_groups(groups, friends)
 
-	for group in groups:  # пройдемся по списку групп
+	print('Группы в которых состоит пользователь, но не состоят его друзья:\n' + str(sorted_groups) + '\n')
 
-		target = groups_is_member(group, friends)  # для каждой группы отправим запрос на API VK, он вернёт нам список
-		# словарей по вхождению каждого друга в эту группу
-
-		for user in target:  # пройдемся циклом по этим словарям
-			if user['member'] == 1:
-				target_list.append(group)
-				break  # если хотя бы один друг входит в эту группу, добавляем номер группы в список target_list
-		print('.')  # показываем, что программа не зависла
-		time.sleep(0.4)  # не даём циклу превысить кол-во обращений к API VK
-
-
-	groups = list(set(groups) - set(target_list))  # вычитаем получившийся список из списка всех групп пользователя
-
-	print('Группы в которых состоит пользователь, но не состоят его друзья:\n' + str(groups) + '\n')  # сообщение в консоль
-
-	groups_info = groups_list_info(groups)  # запрашиваем у API VK информацию о группах из получившегося списка
+	groups_info = groups_list_info(sorted_groups)  # запрашиваем у API VK информацию о группах из получившегося списка
 
 	json_to_file(groups_info)  # сериализуем данные в файл .json формата
 	print('Для вывода в консоль содержимого файла "groups.json" нажмите Enter \n\nДля окончания работы '
