@@ -17,7 +17,7 @@ def print_json_file(input_file='groups.json'):
 		pprint(reader)
 
 
-def sort_groups(groups, friends):
+def sort_groups(groups, friends) -> list:
 	"""
 	Функция проверяющая каждую группу из списка на вхождение в неё пользователей из списка. Обращается к API VK при
 	помощи метода 'groups.isMember'
@@ -44,3 +44,11 @@ def sort_groups(groups, friends):
 	# пользователя
 
 	return groups_sorted
+
+def json_check(response):
+	try:
+		a = response.json()['response']
+	except KeyError as e:
+		print('Ошибка' + e)
+	else:
+		return a
