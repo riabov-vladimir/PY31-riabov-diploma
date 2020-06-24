@@ -24,10 +24,9 @@ def check_user():
 	params = base_params.copy()
 	params['user_ids'] = user_id
 	response = requests.get(request_url, params=params)
-	# json_ = response.json()
 
 	if 'error' in response.json().keys():
-		print('Возникла ошибка: ' + json_['error']['error_msg'] + '\n')
+		print('Возникла ошибка: ' + response.json()['error']['error_msg'] + '\n')
 		check_user()
 	elif response.json()['response'][0].get('is_closed'):
 		print('Пользователь ограничил доступ к своей странице.\n')
@@ -124,7 +123,20 @@ def groups_list_info(groups_list: list):
 		'group_ids': str(groups_list)[1:-1:],
 		'fields': 'members_count'
 	}
-
 	response = requests.get(request_url, params=params)
 
-	return response.json()['response']
+	groups_raw = response.json()['response']
+
+	groups_filtered = []
+
+	excluded_fields = ['is_closed', 'photo_100', 'photo_200', 'photo_50', 'screen_name', 'type']
+
+	for group in groups_raw:
+		filtered_group = {key: value for (key, value) in group.items() if key not in excluded_fields}
+		groups_filtered.append(filtered_group)
+
+	return groups_filtered
+
+
+if __name__ == '__main__':
+	pass
