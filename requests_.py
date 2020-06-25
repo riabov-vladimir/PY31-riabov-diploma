@@ -1,6 +1,4 @@
 import requests
-from pprint import pprint
-import time
 
 access_token = '958eb5d439726565e9333aa30e50e0f937ee432e927f0dbd541c541887d919a7c56f95c04217915c32008'
 
@@ -13,7 +11,7 @@ def json_check(response):
 	try:
 		answer = response.json()['response']
 	except KeyError as e:
-		print('Ошибка: ' + str(e))
+		print('Ошибка ключа: ' + str(e))
 		exit()
 	else:
 		return answer
@@ -142,7 +140,4 @@ def groups_list_info(groups_list: list):
 
 	return groups_filtered
 
-
-if __name__ == '__main__':
-	print(friends_get('wefefwf'))
 
