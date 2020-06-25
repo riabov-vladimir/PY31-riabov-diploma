@@ -45,10 +45,3 @@ def sort_groups(groups, friends) -> list:
 
 	return groups_sorted
 
-def json_check(response):
-	try:
-		a = response.json()['response']
-	except KeyError as e:
-		print('Ошибка' + e)
-	else:
-		return a

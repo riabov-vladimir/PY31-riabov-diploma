@@ -8,6 +8,17 @@ base_url = 'https://api.vk.com/method/'
 base_params = {'access_token': access_token, 'v': 5.107}
 
 
+def json_check(response):
+	"""Проверка ответа API VK на наличие ключа 'response', который присутствует в верно выполненных запросах"""
+	try:
+		answer = response.json()['response']
+	except KeyError as e:
+		print('Ошибка: ' + str(e))
+		exit()
+	else:
+		return answer
+
+
 def check_user(user_input) -> int:
 	"""
 	Наверное, не очень грамотно делать такую нагроможденную функцию, но я всё же решил совместить запрос
@@ -22,20 +33,17 @@ def check_user(user_input) -> int:
 	params['user_ids'] = user_input
 	response = requests.get(request_url, params=params)
 
-	if 'error' in response.json().keys():
-		print('Возникла ошибка: ' + response.json()['error']['error_msg'] + '\n')
-		exit()
-	elif response.json()['response'][0].get('is_closed'):
+	if json_check(response)[0].get('is_closed'):
 		print('Пользователь ограничил доступ к своей странице.\n')
 		exit()
-	elif response.json()['response'][0].get('deactivated') == 'deleted':
+	elif json_check(response)[0].get('deactivated') == 'deleted':
 		print('Пользователь удалён.\n')
 		exit()
-	elif response.json()['response'][0].get('deactivated') == 'banned':
+	elif json_check(response)[0].get('deactivated') == 'banned':
 		print('Пользователь заблокирован.\n')
 		exit()
-	elif not response.json()['response'][0].get('is_closed'):
-		return response.json()['response'][0]['id']  # числовой идентификатор
+	elif not json_check(response)[0].get('is_closed'):
+		return json_check(response)[0]['id']  # числовой идентификатор
 
 
 def friends_get(user_id: int) -> list:
@@ -58,7 +66,7 @@ def friends_get(user_id: int) -> list:
 
 	response = requests.get(request_url, params=params)
 
-	return response.json()['response']['items']
+	return json_check(response)['items']
 
 
 def groups_get(user_id: int) -> list:
@@ -75,7 +83,7 @@ def groups_get(user_id: int) -> list:
 
 	response = requests.get(request_url, params=params)
 
-	return response.json()['response']['items']
+	return json_check(response)['items']
 
 
 def groups_is_member(group_id: str, user_ids: list) -> list:
@@ -100,7 +108,7 @@ def groups_is_member(group_id: str, user_ids: list) -> list:
 
 	response = requests.get(request_url, params=params)
 
-	return response.json()['response']
+	return json_check(response)
 
 
 def groups_list_info(groups_list: list):
@@ -122,7 +130,7 @@ def groups_list_info(groups_list: list):
 	}
 	response = requests.get(request_url, params=params)
 
-	groups_raw = response.json()['response']
+	groups_raw = json_check(response)
 
 	groups_filtered = []
 
@@ -136,4 +144,5 @@ def groups_list_info(groups_list: list):
 
 
 if __name__ == '__main__':
-	pass
+	print(friends_get('wefefwf'))
+
