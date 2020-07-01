@@ -101,10 +101,10 @@ def groups_is_member(group_id: str, user_ids: list) -> list:
 		'access_token': access_token,
 		'v': 5.107,
 		'group_id': group_id,
-		'user_ids': str(user_ids)[1:-1:]
+		'user_ids': str(user_ids).join(', ')
 	}
 
-	response = requests.get(request_url, params=params)
+	response = requests.post(request_url, data=params)
 
 	return json_check(response)
 
