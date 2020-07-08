@@ -146,6 +146,6 @@ def groups_list_info(groups_list: list):
 
 if __name__ == '__main__':
 	user_input = 171691064
-	response = request('users.get', user_ids=str(user_input).join(', '))
-	print(response)
-	print(check_user(171691064))
+	# response = request('users.get', user_ids=str(user_input).join(', '))
+	# print(response)
+	print(friends_get(171691064))
