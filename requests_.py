@@ -1,18 +1,33 @@
 import requests
 
-access_token = '958eb5d439726565e9333aa30e50e0f937ee432e927f0dbd541c541887d919a7c56f95c04217915c32008'
 
-base_url = 'https://api.vk.com/method/'
-base_params = {'access_token': access_token, 'v': 5.107}
+def _request(req_method, **params):
+	URL = 'https://api.vk.com/method/' + req_method
+
+	data = {
+		'access_token': '958eb5d439726565e9333aa30e50e0f937ee432e927f0dbd541c541887d919a7c56f95c04217915c32008',
+		'v': 5.107
+	}
+	data.update(params)
+	response = requests.post(URL, data=data)
+	print(data)
+	if response.status_code != 200:
+		return
+
+	_json = response.json()
+
+	if 'error' in _json:
+		print(f'''Ошибка: {_json.get('error')['error_msg']}''')
+		return
+
+	return _json.get('response')
 
 
-def json_check(response):
-	"""Проверка ответа API VK на наличие ключа 'response', который присутствует в верно выполненных запросах"""
-	try:
-		answer = response.json()['response']
-	except KeyError as e:
-		print('Ошибка ключа: ' + str(e))
-		exit()
+def request(req_method, **params):
+	answer = _request(req_method, **params)
+
+	if not answer:
+		exit(0)
 	else:
 		return answer
 
@@ -26,22 +41,19 @@ def check_user(user_input) -> int:
 	:return: user_id (integer)
 	"""
 
-	request_url = base_url + 'users.get'
-	params = base_params.copy()
-	params['user_ids'] = user_input
-	response = requests.get(request_url, params=params)
+	response = request('users.get', user_ids=str(user_input).join(', '))
 
-	if json_check(response)[0].get('is_closed'):
+	if response[0].get('is_closed'):
 		print('Пользователь ограничил доступ к своей странице.\n')
 		exit()
-	elif json_check(response)[0].get('deactivated') == 'deleted':
+	elif response[0].get('deactivated') == 'deleted':
 		print('Пользователь удалён.\n')
 		exit()
-	elif json_check(response)[0].get('deactivated') == 'banned':
+	elif response[0].get('deactivated') == 'banned':
 		print('Пользователь заблокирован.\n')
 		exit()
-	elif not json_check(response)[0].get('is_closed'):
-		return json_check(response)[0]['id']  # числовой идентификатор
+	elif not response[0].get('is_closed'):
+		return response[0]['id']  # числовой идентификатор
 
 
 def friends_get(user_id: int) -> list:
@@ -54,17 +66,9 @@ def friends_get(user_id: int) -> list:
 	:return: list of int
 	"""
 
-	request_url = base_url + 'friends.get'
-	params = {
-		'access_token': access_token,
-		'v': 5.107,
-		'user_id': user_id,
-		'count': 500,
-	}
+	response = request('friends.get', count=500, user_id=user_id)
 
-	response = requests.get(request_url, params=params)
-
-	return json_check(response)['items']
+	return response['items']
 
 
 def groups_get(user_id: int) -> list:
@@ -140,4 +144,8 @@ def groups_list_info(groups_list: list):
 
 	return groups_filtered
 
-
+if __name__ == '__main__':
+	user_input = 171691064
+	response = request('users.get', user_ids=str(user_input).join(', '))
+	print(response)
+	print(check_user(171691064))
