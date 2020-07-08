@@ -1,18 +1,33 @@
 import requests
 
-access_token = '958eb5d439726565e9333aa30e50e0f937ee432e927f0dbd541c541887d919a7c56f95c04217915c32008'
 
-base_url = 'https://api.vk.com/method/'
-base_params = {'access_token': access_token, 'v': 5.107}
+def _request(req_method, **params):
+	URL = 'https://api.vk.com/method/' + req_method
+
+	data = {
+		'access_token': '958eb5d439726565e9333aa30e50e0f937ee432e927f0dbd541c541887d919a7c56f95c04217915c32008',
+		'v': 5.107
+	}
+	data.update(params)
+	response = requests.post(URL, data=data)
+
+	if response.status_code != 200:
+		return
+
+	_json = response.json()
+
+	if 'error' in _json:
+		print(f'''Ошибка: {_json.get('error')['error_msg']}''')
+		return
+
+	return _json.get('response')
 
 
-def json_check(response):
-	"""Проверка ответа API VK на наличие ключа 'response', который присутствует в верно выполненных запросах"""
-	try:
-		answer = response.json()['response']
-	except KeyError as e:
-		print('Ошибка ключа: ' + str(e))
-		exit()
+def request(req_method, **params):
+	answer = _request(req_method, **params)
+
+	if not answer:
+		exit(0)
 	else:
 		return answer
 
@@ -26,22 +41,19 @@ def check_user(user_input) -> int:
 	:return: user_id (integer)
 	"""
 
-	request_url = base_url + 'users.get'
-	params = base_params.copy()
-	params['user_ids'] = user_input
-	response = requests.get(request_url, params=params)
+	response = request('users.get', user_ids=str(user_input).join(', '))
 
-	if json_check(response)[0].get('is_closed'):
+	if response[0].get('is_closed'):
 		print('Пользователь ограничил доступ к своей странице.\n')
 		exit()
-	elif json_check(response)[0].get('deactivated') == 'deleted':
+	elif response[0].get('deactivated') == 'deleted':
 		print('Пользователь удалён.\n')
 		exit()
-	elif json_check(response)[0].get('deactivated') == 'banned':
+	elif response[0].get('deactivated') == 'banned':
 		print('Пользователь заблокирован.\n')
 		exit()
-	elif not json_check(response)[0].get('is_closed'):
-		return json_check(response)[0]['id']  # числовой идентификатор
+	elif not response[0].get('is_closed'):
+		return response[0]['id']  # числовой идентификатор
 
 
 def friends_get(user_id: int) -> list:
@@ -54,34 +66,18 @@ def friends_get(user_id: int) -> list:
 	:return: list of int
 	"""
 
-	request_url = base_url + 'friends.get'
-	params = {
-		'access_token': access_token,
-		'v': 5.107,
-		'user_id': user_id,
-		'count': 500,
-	}
+	response = request('friends.get', count=500, user_id=user_id)
 
-	response = requests.get(request_url, params=params)
-
-	return json_check(response)['items']
+	return response['items']
 
 
 def groups_get(user_id: int) -> list:
 
 	"""Функция возвразающая список групп, в которых состоит указанный пользователь"""
 
-	request_url = base_url + 'groups.get'
-	params = {
-		'access_token': access_token,
-		'v': 5.107,
-		'user_id': user_id,
-		'count': 500
-	}
+	response = request('groups.get', user_id=user_id)
 
-	response = requests.get(request_url, params=params)
-
-	return json_check(response)['items']
+	return response['items']
 
 
 def groups_is_member(group_id: str, user_ids: list) -> list:
@@ -96,17 +92,9 @@ def groups_is_member(group_id: str, user_ids: list) -> list:
 	:return: list of dicts
 	"""
 
-	request_url = base_url + 'groups.isMember'
-	params = {
-		'access_token': access_token,
-		'v': 5.107,
-		'group_id': group_id,
-		'user_ids': str(user_ids).join(', ')
-	}
+	respopnse = request('groups.isMember', user_ids=str(user_ids).join(', '), group_id=group_id)
 
-	response = requests.post(request_url, data=params)
-
-	return json_check(response)
+	return respopnse
 
 
 def groups_list_info(groups_list: list):
@@ -118,17 +106,7 @@ def groups_list_info(groups_list: list):
 	:return: list of dicts
 	"""
 
-	request_url = base_url + 'groups.getById'
-
-	params = {
-		'access_token': access_token,
-		'v': 5.107,
-		'group_ids': str(groups_list)[1:-1:],
-		'fields': 'members_count'
-	}
-	response = requests.get(request_url, params=params)
-
-	groups_raw = json_check(response)
+	groups_raw = request('groups.getById', fields='members_count', group_ids=str(groups_list)[1:-1])
 
 	groups_filtered = []
 
@@ -139,5 +117,3 @@ def groups_list_info(groups_list: list):
 		groups_filtered.append(filtered_group)
 
 	return groups_filtered
-
-

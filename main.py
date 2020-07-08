@@ -1,13 +1,14 @@
 from requests_ import groups_get, friends_get, groups_list_info, check_user
 from functions import json_to_file, print_json_file, sort_groups
 import datetime
+
 """
 Ввод данных (идентификатор пользователя) осуществляется через консоль. Аргументом может быть как id так и screen_name.
 Идентификаторы, которые я использовал для проверки программы:
 372957 - Пользователь удалён
 anyagrapes - Пользователь заблокирован
 eshmargunov - открытый профиль, программа отрабатывает полностью
-arbore - открытый профиль, программа отрабатывает полностью
+arbore - закрытый профиль
 """
 
 if __name__ == '__main__':
@@ -43,5 +44,3 @@ if __name__ == '__main__':
 		print_json_file()
 	else:
 		print('До свидания!')
-
-
