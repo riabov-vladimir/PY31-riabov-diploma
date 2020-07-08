@@ -10,7 +10,7 @@ def _request(req_method, **params):
 	}
 	data.update(params)
 	response = requests.post(URL, data=data)
-	print(data)
+
 	if response.status_code != 200:
 		return
 
@@ -92,17 +92,9 @@ def groups_is_member(group_id: str, user_ids: list) -> list:
 	:return: list of dicts
 	"""
 
-	request_url = base_url + 'groups.isMember'
-	params = {
-		'access_token': access_token,
-		'v': 5.107,
-		'group_id': group_id,
-		'user_ids': str(user_ids).join(', ')
-	}
+	respopnse = request('groups.isMember', user_ids=str(user_ids).join(', '), group_id=group_id)
 
-	response = requests.post(request_url, data=params)
-
-	return json_check(response)
+	return respopnse
 
 
 def groups_list_info(groups_list: list):
@@ -114,17 +106,7 @@ def groups_list_info(groups_list: list):
 	:return: list of dicts
 	"""
 
-	request_url = base_url + 'groups.getById'
-
-	params = {
-		'access_token': access_token,
-		'v': 5.107,
-		'group_ids': str(groups_list)[1:-1:],
-		'fields': 'members_count'
-	}
-	response = requests.get(request_url, params=params)
-
-	groups_raw = json_check(response)
+	groups_raw = request('groups.getById', fields='members_count', group_ids=str(groups_list).join(', '))
 
 	groups_filtered = []
 
@@ -136,8 +118,10 @@ def groups_list_info(groups_list: list):
 
 	return groups_filtered
 
+
 if __name__ == '__main__':
 	user_input = 171691064
+	user_ids = [4929, 7858, 11952, 48807, 58439, 71491, 75458, 78540, 105932, 143611, 144253]
 	# response = request('users.get', user_ids=str(user_input).join(', '))
 	# print(response)
-	print(groups_get(171691064))
+	print(groups_is_member('171691064', user_ids))
