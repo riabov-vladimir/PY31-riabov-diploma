@@ -34,7 +34,7 @@ if __name__ == '__main__':
 	print('Группы в которых состоит пользователь, но не состоят его друзья:\n' + str(sorted_groups) + '\n')
 
 	groups_info = groups_list_info(sorted_groups)  # запрашиваем у API VK информацию о группах из получившегося списка
-
+	print(groups_info)
 	json_to_file(groups_info)  # сериализуем данные в файл .json формата
 	print('Для вывода в консоль содержимого файла "groups.json" нажмите Enter \n\nДля окончания работы '
 					'программы введите любой символ и нажмите Enter\n>>>')

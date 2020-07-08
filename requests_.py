@@ -106,7 +106,7 @@ def groups_list_info(groups_list: list):
 	:return: list of dicts
 	"""
 
-	groups_raw = request('groups.getById', fields='members_count', group_ids=str(groups_list).join(', '))
+	groups_raw = request('groups.getById', fields='members_count', group_ids=str(groups_list)[1:-1]) #.join(', '))
 
 	groups_filtered = []
 
