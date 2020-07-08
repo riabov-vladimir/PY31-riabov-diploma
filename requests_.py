@@ -106,7 +106,7 @@ def groups_list_info(groups_list: list):
 	:return: list of dicts
 	"""
 
-	groups_raw = request('groups.getById', fields='members_count', group_ids=str(groups_list)[1:-1]) #.join(', '))
+	groups_raw = request('groups.getById', fields='members_count', group_ids=str(groups_list)[1:-1])
 
 	groups_filtered = []
 
@@ -117,11 +117,3 @@ def groups_list_info(groups_list: list):
 		groups_filtered.append(filtered_group)
 
 	return groups_filtered
-
-
-if __name__ == '__main__':
-	user_input = 171691064
-	user_ids = [4929, 7858, 11952, 48807, 58439, 71491, 75458, 78540, 105932, 143611, 144253]
-	# response = request('users.get', user_ids=str(user_input).join(', '))
-	# print(response)
-	print(groups_is_member('171691064', user_ids))
