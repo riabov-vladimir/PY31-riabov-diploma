@@ -75,17 +75,9 @@ def groups_get(user_id: int) -> list:
 
 	"""Функция возвразающая список групп, в которых состоит указанный пользователь"""
 
-	request_url = base_url + 'groups.get'
-	params = {
-		'access_token': access_token,
-		'v': 5.107,
-		'user_id': user_id,
-		'count': 500
-	}
+	response = request('groups.get', user_id=user_id)
 
-	response = requests.get(request_url, params=params)
-
-	return json_check(response)['items']
+	return response['items']
 
 
 def groups_is_member(group_id: str, user_ids: list) -> list:
@@ -148,4 +140,4 @@ if __name__ == '__main__':
 	user_input = 171691064
 	# response = request('users.get', user_ids=str(user_input).join(', '))
 	# print(response)
-	print(friends_get(171691064))
+	print(groups_get(171691064))
